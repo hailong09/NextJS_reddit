@@ -15,6 +15,7 @@ import {
 import { mapFieldErrors } from "../helpers/mapFieldErrors";
 import { useCheckAuth } from "../utils/useCheckAuth";
 import { useToast } from "@chakra-ui/react";
+import { initializeApollo } from "../lib/apolloClient";
 const Login = () => {
   const router = useRouter();
   const { data: authData, loading: authLoading } = useCheckAuth();
@@ -51,6 +52,9 @@ const Login = () => {
         duration: 3000,
         isClosable: true,
       })
+
+      const apolloClient = initializeApollo()
+      apolloClient.resetStore()
       router.push("/");
     }
   };
@@ -62,7 +66,7 @@ const Login = () => {
           <Spinner />
         </Flex>
       ) : (
-        <Wrapper>
+        <Wrapper size='small'>
           {error && <p>Failed to register</p>}
           <Formik initialValues={initialValues} onSubmit={onLoginSubmit}>
             {({ isSubmitting }) => (

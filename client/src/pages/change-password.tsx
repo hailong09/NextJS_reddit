@@ -65,7 +65,7 @@ const ChangePassword = () => {
           <Spinner />
         </Flex>
       ) : !query.token || !query.userId ? (
-        <Wrapper>
+        <Wrapper size='small'>
           <Alert status="error">
             <AlertIcon />
             <AlertTitle>Invalid password change request</AlertTitle>
@@ -77,7 +77,7 @@ const ChangePassword = () => {
           </Flex>
         </Wrapper>
       ) : (
-        <Wrapper>
+        <Wrapper size='small'>
           <Formik initialValues={initialValues} onSubmit={onChangePassword}>
             {
               ({ isSubmitting }) => (

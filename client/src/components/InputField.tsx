@@ -3,6 +3,7 @@ import {
   FormLabel,
   Input,
   FormErrorMessage,
+  Textarea,
 } from "@chakra-ui/react";
 import { useField } from "formik";
 
@@ -11,6 +12,7 @@ interface IInputFieldProps {
   label: string;
   placeholder: string;
   type: string;
+  textarea?: boolean;
 }
 const InputField = (props: IInputFieldProps) => {
   const [field, { error }] = useField(props);
@@ -18,13 +20,23 @@ const InputField = (props: IInputFieldProps) => {
   return (
     <FormControl isInvalid={!!error}>
       <FormLabel htmlFor={field.name}>{props.label}</FormLabel>
-      <Input
-        onChange={field.onChange}
-        value={field.value}
-        id={field.name}
-        placeholder={props.placeholder}
-        type={props.type}
-      />
+      {props.textarea ? (
+        <Textarea
+          onChange={field.onChange}
+          value={field.value}
+          id={field.name}
+          placeholder={props.placeholder}
+          type={props.type}
+        />
+      ) : (
+        <Input
+          onChange={field.onChange}
+          value={field.value}
+          id={field.name}
+          placeholder={props.placeholder}
+          type={props.type}
+        />
+      )}
       {error && <FormErrorMessage>{error}</FormErrorMessage>}
     </FormControl>
   );

@@ -1,0 +1,11 @@
+fragment postMutaionResponse on PostMutationResponse {
+  code
+  success
+  message
+  post {
+    ...postWithUserInfo
+  }
+  errors {
+    ...fieldError
+  }
+}

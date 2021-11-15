@@ -1,6 +1,14 @@
 import argon2 from "argon2";
 import { User } from "../entities/User";
-import { Resolver, Mutation, Arg, Ctx, Query } from "type-graphql";
+import {
+  Resolver,
+  Mutation,
+  Arg,
+  Ctx,
+  Query,
+  FieldResolver,
+  Root,
+} from "type-graphql";
 import { UserMutationResponse } from "../types/UserMutationResponse";
 import { RegisterInput } from "../types/RegisterInput";
 import { validateRegisterInput } from "../utils/validateRegisterInput";
@@ -13,8 +21,15 @@ import { Tokenmodel } from "../model/Token";
 import { v4 as uuidv4 } from "uuid";
 import { ChangePasswordInput } from "../types/ChangePasswordInput";
 
-@Resolver()
+@Resolver((_of) => User)
 export class UserResovlver {
+  @FieldResolver((_return) => String)
+  email(@Root() user: User, @Ctx() { req }: Context) {
+    if (req.session.userId === user.id) {
+      return user.email;
+    }
+    return "";
+  }
   @Query((_return) => User, { nullable: true })
   async me(@Ctx() { req }: Context): Promise<User | null | undefined> {
     if (!req.session.userId) return null;
@@ -178,7 +193,7 @@ export class UserResovlver {
     @Arg("token") token: string,
     @Arg("userId") userId: string,
     @Arg("changePasswordInput") changePasswordInput: ChangePasswordInput,
-    @Ctx() {req}: Context
+    @Ctx() { req }: Context
   ): Promise<UserMutationResponse> {
     if (changePasswordInput.newPassword.length <= 2) {
       return {
@@ -207,9 +222,9 @@ export class UserResovlver {
         };
       }
 
-      const resetPasswordTokenValid = argon2.verify(resetPassword.token, token)
+      const resetPasswordTokenValid = argon2.verify(resetPassword.token, token);
 
-      if(!resetPasswordTokenValid){
+      if (!resetPasswordTokenValid) {
         return {
           code: 400,
           success: false,
@@ -222,9 +237,9 @@ export class UserResovlver {
           ],
         };
       }
-      const userIdNum = parseInt(userId)
-      const user = await User.findOne(userIdNum)
-      if(!user){
+      const userIdNum = parseInt(userId);
+      const user = await User.findOne(userIdNum);
+      if (!user) {
         return {
           code: 400,
           success: false,
@@ -238,16 +253,18 @@ export class UserResovlver {
         };
       }
 
-      const updatedPassword = await argon2.hash(changePasswordInput.newPassword)
-     
-      await User.update({id: userIdNum}, {password: updatedPassword})
-      await resetPassword.deleteOne()
-      req.session.userId = user.id
+      const updatedPassword = await argon2.hash(
+        changePasswordInput.newPassword
+      );
+
+      await User.update({ id: userIdNum }, { password: updatedPassword });
+      await resetPassword.deleteOne();
+      req.session.userId = user.id;
       return {
         code: 200,
         success: true,
         message: "Password Changed!!",
-        user
+        user,
       };
     } catch (err) {
       console.log(err);

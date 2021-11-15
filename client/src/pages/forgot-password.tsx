@@ -32,7 +32,7 @@ const ForgotPassword = () => {
           <Spinner />
         </Flex>
       ) : (
-        <Wrapper>
+        <Wrapper size='small'>
           <Formik initialValues={initialValues} onSubmit={onForgetPassword}>
             {({ isSubmitting }) =>
               !loading && data ? (
